@@ -1,0 +1,20 @@
+{
+    "manifest_version": 2,
+    "name": "SyncVerse",
+    "description": "A lyric viewer for streaming services.",
+    "version": "0.1",
+    "permissions": ["activeTab", "tabs", "https://lrclib.net/*", "scripting", "http://*/*", "https://*/*"],
+    "icons": {
+      "48": "icon.png"
+    },
+    "browser_action": {
+      "default_icon": "icon.png"
+    },
+    "content_scripts": [
+      {
+        "matches": ["*://*.deezer.com/*", "*://*.spotify.com/*", "*://*.youtube.com/*"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
