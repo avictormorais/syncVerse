@@ -2,6 +2,7 @@ let atualUrl = window.location.href;
 let streamingService
 let verses = []
 let currentTrack = ''
+let selectors = []
 
 if (atualUrl.includes("deezer.com")) {
     streamingService = 'deezer'
@@ -43,39 +44,38 @@ function findVerseByTime(time) {
     for (let i = 0; i < verses.length; i++) {
         if (verses[i].time === time) {
             currentVerse = verses[i].verse;
-            previousVerse = verses[i - 1].verse || '♩ ♩ ♩';
-            nextVerse = verses[i + 1].verse || '';
-            break;
-        } else if (verses[i].time > time) {
-            nextVerse = verses[i].verse;
-            previousVerse = verses[i - 1].verse || '♩ ♩ ♩';
-            break;
+            if(i === 0){
+                previousVerse = '';
+            } else{
+                previousVerse = verses[i - 1].verse;
+            }
+            if(i === verses.length - 1){
+                nextVerse = '';
+            } else{
+                nextVerse = verses[i + 1].verse;
+            }
+            return {
+                currentVerse,
+                previousVerse,
+                nextVerse
+            };
         }
     }
+}
 
-    return {
-        currentVerse,
-        previousVerse,
-        nextVerse
+
+fetch('https://raw.githubusercontent.com/avictormorais/syncVerse/main/queryElements.json')
+.then(response => response.json())
+.then(data => {
+    const selector = data.services[streamingService];
+    selectors = {
+        track: selector.track,
+        divArtists: selector.divArtists,
+        artist: selector.artist,
+        divSpan: selector.divSpan,
+        currentTime: selector.currentTime
     };
-}
-
-let queryElements = {
-    "services": {
-      "spotify": {
-        "track": "a[data-testid='context-item-link']",
-        "divArtists": "div[data-testid='context-item-info-subtitles']",
-        "artist": "a[data-testid='context-item-info-artist'][draggable='true']",
-        "divSpan": "div[data-testid='now-playing-widget']"
-      }
-    }
-}
-
-const selectors = queryElements.services.spotify;
-const trackSelector = selectors.track;
-const divArtists = selectors.divArtists;
-const artistSelector = selectors.artist;
-const divSelector = selectors.divSpan;
+});
 
 if(streamingService){
     const logoSpan = document.createElement('span');
@@ -95,7 +95,7 @@ if(streamingService){
     });
 
     let intervalId = setInterval(() => {
-        let div = document.querySelector(divSelector);
+        let div = document.querySelector(selectors.divSpan);
         if (div) {
             clearInterval(intervalId);
             div.appendChild(logoSpan);
@@ -104,15 +104,15 @@ if(streamingService){
 }
 
 setInterval(() => {
-    if(document.querySelector(trackSelector)){
-        let track = document.querySelector(trackSelector).innerHTML;
+    if(document.querySelector(selectors.track)){
+        let track = document.querySelector(selectors.track).innerHTML;
         let artistsList;
         let divListArtists
-        if(divArtists != ''){
-            divListArtists = document.querySelector(divArtists);
-            artistsList = divListArtists.querySelectorAll(artistSelector);  
+        if(selectors.divArtists != ''){
+            divListArtists = document.querySelector(selectors.divArtists);
+            artistsList = divListArtists.querySelectorAll(selectors.artist);  
         } else{
-            artistsList = document.querySelectorAll(artistSelector);  
+            artistsList = document.querySelectorAll(selectors.artist);  
         }
         let artists = '';
         artistsList.forEach(artist => {
@@ -125,7 +125,17 @@ setInterval(() => {
             currentTrack = `${track} ${artists}`;
             getLyrics(`track_name=${track}&artist_name=${artists}`).then(() => {
                 if(verses.length > 0){
-                    console.log(verses)
+                    // draw a empty cover or get the first verse to show as the next
+                    setInterval(() => {
+                        if(document.querySelector(selectors.currentTime)){
+                            // draw the previos, current and next verses
+                            let currentTime = `0${document.querySelector(selectors.currentTime).innerText}`
+                            let verses = findVerseByTime(currentTime)
+                            if(verses){
+                                console.log(verses.currentVerse)
+                            }
+                        }
+                    }, 1000);
                 }
             });
         }
