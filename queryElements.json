@@ -1,0 +1,10 @@
+{
+  "services": {
+    "spotify": {
+      "track": "a[data-testid='context-item-link']",
+      "divArtists": "div[data-testid='context-item-info-subtitles']",
+      "artist": "a[data-testid='context-item-info-artist'][draggable='true']",
+      "divSpan": "div[data-testid='now-playing-widget']"
+    }
+  }
+}
