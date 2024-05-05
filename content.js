@@ -3,6 +3,8 @@ let streamingService
 let verses = []
 let currentTrack = ''
 let selectors = []
+let canvas
+let videoElement
 
 if (atualUrl.includes("deezer.com")) {
     streamingService = 'deezer'
@@ -23,6 +25,26 @@ class verse {
     }
 }
 async function getLyrics(query){
+    if(!canvas){
+        canvas = document.createElement('canvas');
+        canvas.width = 470;
+        canvas.height = 470;
+        var contexto = canvas.getContext('2d');
+        contexto.fillStyle = 'white';
+        contexto.font = `70px Oswald`;
+
+        const stream = canvas.captureStream(25);
+        drawTrackInfos();
+
+        videoElement = document.createElement('video');
+        videoElement.srcObject = stream;
+
+        videoElement.onloadedmetadata = () => {
+            videoElement.play();
+            console.log('playing')
+        };
+    }
+    
     try {
         const response = await fetch(`https://lrclib.net/api/search?${query}`);
         const data = await response.json();
@@ -91,7 +113,11 @@ if(streamingService){
     logoSpan.appendChild(logoImage);
 
     logoSpan.addEventListener('click', () => {
-        console.log('logo clicked')
+        if ('pictureInPictureEnabled' in document) {
+            videoElement.requestPictureInPicture();
+        } else {
+            console.log('Picture-in-Picture não é suportado neste navegador.');
+        }
     });
 
     let intervalId = setInterval(() => {
@@ -117,15 +143,16 @@ setInterval(() => {
         let artists = '';
         artistsList.forEach(artist => {
             if(artist.innerHTML){
-                artists += `${artist.innerHTML} `;
+                artists += `${artist.innerHTML}, `;
             }
         });
+        artists = artists.slice(0, -2);
         if(track && artists && currentTrack !== `${track} ${artists}`){
             verses = [];
-            currentTrack = `${track} ${artists}`;
+            currentTrack = `${track}<->${artists}`;
             getLyrics(`track_name=${track}&artist_name=${artists}`).then(() => {
                 if(verses.length > 0){
-                    // draw a empty cover or get the first verse to show as the next
+                    // get the first verse to show as the next
                     setInterval(() => {
                         if(document.querySelector(selectors.currentTime)){
                             // draw the previos, current and next verses
@@ -136,8 +163,20 @@ setInterval(() => {
                             }
                         }
                     }, 1000);
+                } else{
+                    drawTrackInfos();
                 }
             });
         }
     }
 }, 1000);
+
+function drawTrackInfos(){
+    let ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'left';
+    ctx.font = `35px Oswald`;
+    ctx.fillText(currentTrack.split('<->')[0], 30, 417);
+    ctx.font = `25px Oswald`;
+    ctx.fillText(currentTrack.split('<->')[1], 30, 450);
+}
