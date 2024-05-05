@@ -5,7 +5,8 @@
       "divArtists": "div[data-testid='context-item-info-subtitles']",
       "artist": "a[data-testid='context-item-info-artist'][draggable='true']",
       "divSpan": "div[data-testid='now-playing-widget']",
-      "currentTime": "div[data-testid='playback-position']"
+      "currentTime": "div[data-testid='playback-position']",
+      "cover": "'img[data-testid='cover-art-image']'"
     }
   }
 }

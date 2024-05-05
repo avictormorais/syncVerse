@@ -5,6 +5,7 @@ let currentTrack = ''
 let selectors = []
 let canvas
 let videoElement
+let cover
 
 if (atualUrl.includes("deezer.com")) {
     streamingService = 'deezer'
@@ -32,16 +33,15 @@ async function getLyrics(query){
         var contexto = canvas.getContext('2d');
         contexto.fillStyle = 'white';
         contexto.font = `70px Oswald`;
+        drawTrackInfos();
 
         const stream = canvas.captureStream(25);
-        drawTrackInfos();
 
         videoElement = document.createElement('video');
         videoElement.srcObject = stream;
 
         videoElement.onloadedmetadata = () => {
             videoElement.play();
-            console.log('playing')
         };
     }
     
@@ -85,7 +85,6 @@ function findVerseByTime(time) {
     }
 }
 
-
 fetch('https://raw.githubusercontent.com/avictormorais/syncVerse/main/queryElements.json')
 .then(response => response.json())
 .then(data => {
@@ -95,7 +94,8 @@ fetch('https://raw.githubusercontent.com/avictormorais/syncVerse/main/queryEleme
         divArtists: selector.divArtists,
         artist: selector.artist,
         divSpan: selector.divSpan,
-        currentTime: selector.currentTime
+        currentTime: selector.currentTime,
+        cover: selector.cover
     };
 });
 
@@ -116,7 +116,7 @@ if(streamingService){
         if ('pictureInPictureEnabled' in document) {
             videoElement.requestPictureInPicture();
         } else {
-            console.log('Picture-in-Picture não é suportado neste navegador.');
+            console.log('Picture-in-Picture is not supported');
         }
     });
 
@@ -147,19 +147,20 @@ setInterval(() => {
             }
         });
         artists = artists.slice(0, -2);
-        if(track && artists && currentTrack !== `${track} ${artists}`){
+        if(track && artists && currentTrack !== `${track}<->${artists}`){
             verses = [];
+            cover = document.querySelector(selectors.cover).src;
+            drawTrackInfos();
             currentTrack = `${track}<->${artists}`;
             getLyrics(`track_name=${track}&artist_name=${artists}`).then(() => {
                 if(verses.length > 0){
-                    // get the first verse to show as the next
+                    writeText(verses[0].verse, '', verses[1].verse);
                     setInterval(() => {
                         if(document.querySelector(selectors.currentTime)){
-                            // draw the previos, current and next verses
                             let currentTime = `0${document.querySelector(selectors.currentTime).innerText}`
                             let verses = findVerseByTime(currentTime)
                             if(verses){
-                                console.log(verses.currentVerse)
+                                writeText(verses.currentVerse, verses.previousVerse, verses.nextVerse);
                             }
                         }
                     }, 1000);
@@ -172,11 +173,96 @@ setInterval(() => {
 }, 1000);
 
 function drawTrackInfos(){
+    if(!canvas){
+        return
+    }
     let ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'white';
-    ctx.textAlign = 'left';
-    ctx.font = `35px Oswald`;
-    ctx.fillText(currentTrack.split('<->')[0], 30, 417);
-    ctx.font = `25px Oswald`;
-    ctx.fillText(currentTrack.split('<->')[1], 30, 450);
+    if(streamingService == 'spotify'){
+        src = cover.replace('4851', '1e02') 
+    }
+    let tempCover = new Image();
+    tempCover.crossOrigin = "anonymous";
+    tempCover.src = src;
+    tempCover.addEventListener('load', () => {
+        ctx.filter = "blur(5px)";
+        ctx.drawImage(tempCover, 0, 0, 470, 470);
+        ctx.filter = "brightness(0.7)";
+        ctx.drawImage(canvas, 0, 0, 470, 470);
+        ctx.filter = "none";
+
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'left';
+        ctx.font = `35px Oswald`;
+        ctx.fillText(currentTrack.split('<->')[0].replace("amp;", ''), 30, 417);
+        ctx.font = `25px Oswald`;
+        ctx.fillText(currentTrack.split('<->')[1].replace("amp;", ''), 30, 450);
+    });
+}
+
+function writeText(currentText, previousText, nextText) {
+    if (canvas) {
+        drawTrackInfos();
+        ctx = canvas.getContext('2d');
+        ctx.textAlign = 'center';
+        ctx.font = `40px Oswald`
+        let maxWidth = 430;
+        let spaceBetweenLines = 7;
+        let spaceBetweenVerses = 15;
+        var centerX = 470 / 2;
+        var centerY = 400 / 2;
+
+        var lineHeight = 40 + spaceBetweenLines;
+        function splitText(text) {
+            var words = text.split(" ");
+            var lines = [];
+            var currentLine = "";
+
+            words.forEach(function (word) {
+                var testLine = currentLine + (currentLine ? " " : "") + word;
+                var testWidth = ctx.measureText(testLine).width;
+
+                if (testWidth > maxWidth) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            });
+            lines.push(currentLine);
+            return lines;
+        }
+
+        function drawText(text, startY) {
+            var lines = splitText(text);
+            lines.forEach(function (line) {
+                ctx.fillText(line, centerX, startY);
+                startY += lineHeight;
+            });
+        }
+
+        let linesLength = splitText(currentText).length;
+        let textHeight = linesLength * lineHeight;
+        var currentYStart = (centerY - (textHeight / 2) + (spaceBetweenLines * linesLength)) + (lineHeight / 2);
+
+        drawText(currentText, currentYStart);
+
+        if (previousText) {
+            ctx.globalAlpha = 0.55;
+            ctx.font = `30px Oswald`;
+            let previousTextHeight = lineHeight * splitText(previousText).length;
+            var previousYStart = currentYStart - previousTextHeight - spaceBetweenLines - spaceBetweenVerses;
+            drawText(previousText, previousYStart);
+            ctx.globalAlpha = 1;
+            ctx.font = `40px Oswald`;
+        }
+
+        if (nextText) {
+            ctx.globalAlpha = 0.55;
+            ctx.font = `35px Oswald`;
+            var nextYStart = currentYStart + textHeight + spaceBetweenLines + spaceBetweenVerses;
+            drawText(nextText, nextYStart);
+            ctx.globalAlpha = 1;
+            ctx.font = `40px Oswald`;
+        }
+    }
 }
