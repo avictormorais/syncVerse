@@ -158,7 +158,10 @@ setInterval(() => {
                     writeText('', '', verses[0].verse);
                     setInterval(() => {
                         if(document.querySelector(selectors.currentTime)){
-                            let currentTime = `0${document.querySelector(selectors.currentTime).innerText}`
+                            let currentTime = document.querySelector(selectors.currentTime).innerText
+                            if(currentTime.split(':')[0].length === 1){
+                                currentTime = `0${currentTime}`
+                            }
                             let verses = findVerseByTime(currentTime)
                             if(verses){
                                 if(verses.currentVerse.verse !== currentVerse){

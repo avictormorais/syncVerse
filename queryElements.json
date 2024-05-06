@@ -7,6 +7,14 @@
       "divSpan": "div[data-testid='now-playing-widget']",
       "currentTime": "div[data-testid='playback-position']",
       "cover": "img[data-testid='cover-art-image']"
+    },
+    "deezer": {
+      "track": "p[data-testid='item_title'] > a",
+      "divArtists": "p[data-testid='item_subtitle']",
+      "artist": "a.chakra-link.track-link",
+      "divSpan": "div.css-w7wtb1",
+      "currentTime": "p[data-testid='elapsed_time']",
+      "cover": "div[data-testid='item_cover'] > div > img"
     }
   }
 }
