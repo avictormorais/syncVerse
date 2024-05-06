@@ -151,7 +151,18 @@ setInterval(() => {
         if(track && artists && currentTrack !== `${track}<->${artists}`){
             verses = [];
             cover = document.querySelector(selectors.cover).src;
-            drawTrackInfos();
+            if(streamingService == 'deezer' && cover == 'https://e-cdns-images.dzcdn.net/images/cover/d41d8cd98f00b204e9800998ecf8427e/264x264-000000-80-0-0.jpg'){
+                const intervalCover = setInterval(() => {
+                    let tempcover = document.querySelector(selectors.cover).src;
+                    if (tempcover !== 'https://e-cdns-images.dzcdn.net/images/cover/d41d8cd98f00b204e9800998ecf8427e/264x264-000000-80-0-0.jpg') {
+                        cover = tempcover;
+                        drawTrackInfos();
+                        clearInterval(intervalCover);
+                    }
+                }, 300);                
+            } else{
+                drawTrackInfos();
+            }
             currentTrack = `${track}<->${artists}`;
             getLyrics(`track_name=${track}&artist_name=${artists}`).then(() => {
                 if(verses.length > 0){
