@@ -6,6 +6,7 @@ let selectors = []
 let canvas
 let videoElement
 let cover
+let currentVerse
 
 if (atualUrl.includes("deezer.com")) {
     streamingService = 'deezer'
@@ -18,7 +19,7 @@ if (atualUrl.includes("deezer.com")) {
 class verse {
     constructor(verse, time) {
         if(verse == undefined || verse == null || verse == ""){
-            this.verse = '♩ ♩ ♩'
+            this.verse = '♪ ♪ ♪'
         } else{
             this.verse = verse;
         }
@@ -59,22 +60,22 @@ async function getLyrics(query){
 }
 
 function findVerseByTime(time) {
-    let currentVerse = '♩ ♩ ♩';
-    let previousVerse = '♩ ♩ ♩';
-    let nextVerse = '♩ ♩ ♩';
+    let currentVerse = '♪ ♪ ♪';
+    let previousVerse = '♪ ♪ ♪';
+    let nextVerse = '♪ ♪ ♪';
 
     for (let i = 0; i < verses.length; i++) {
         if (verses[i].time === time) {
-            currentVerse = verses[i].verse;
+            currentVerse = verses[i];
             if(i === 0){
                 previousVerse = '';
             } else{
-                previousVerse = verses[i - 1].verse;
+                previousVerse = verses[i - 1];
             }
             if(i === verses.length - 1){
                 nextVerse = '';
             } else{
-                nextVerse = verses[i + 1].verse;
+                nextVerse = verses[i + 1];
             }
             return {
                 currentVerse,
@@ -101,15 +102,15 @@ fetch('https://raw.githubusercontent.com/avictormorais/syncVerse/main/queryEleme
 
 if(streamingService){
     const logoSpan = document.createElement('span');
-    logoSpan.style.width = '25px';
-    logoSpan.style.height = '25px';
+    logoSpan.style.minWidth = '25px';
+    logoSpan.style.minHeight = '25px';
     logoSpan.style.cursor = 'pointer';
     logoSpan.style.marginLeft = '10px';
     logoSpan.style.display = 'flex';
     const logoImage = document.createElement('img');
     logoImage.src = 'https://raw.githubusercontent.com/avictormorais/syncVerse/d1c085aeec623c590c324e44efb151020fef5010/icon.png?raw=true';
-    logoImage.style.width = '100%';
-    logoImage.style.height = '100%';
+    logoImage.style.width = '25px';
+    logoImage.style.height = 'auto';
     logoSpan.appendChild(logoImage);
 
     logoSpan.addEventListener('click', () => {
@@ -154,13 +155,16 @@ setInterval(() => {
             currentTrack = `${track}<->${artists}`;
             getLyrics(`track_name=${track}&artist_name=${artists}`).then(() => {
                 if(verses.length > 0){
-                    writeText(verses[0].verse, '', verses[1].verse);
+                    writeText('', '', verses[0].verse);
                     setInterval(() => {
                         if(document.querySelector(selectors.currentTime)){
                             let currentTime = `0${document.querySelector(selectors.currentTime).innerText}`
                             let verses = findVerseByTime(currentTime)
                             if(verses){
-                                writeText(verses.currentVerse, verses.previousVerse, verses.nextVerse);
+                                if(verses.currentVerse.verse !== currentVerse){
+                                    writeText(verses.currentVerse.verse, verses.previousVerse.verse, verses.nextVerse.verse);
+                                    currentVerse = verses.currentVerse.verse
+                                }
                             }
                         }
                     }, 1000);
@@ -172,14 +176,18 @@ setInterval(() => {
     }
 }, 1000);
 
-function drawTrackInfos(){
-    if(!canvas){
-        return
+function drawTrackInfos(callback) {
+    if (!canvas) {
+        return;
     }
+
     let ctx = canvas.getContext('2d');
-    if(streamingService == 'spotify'){
-        src = cover.replace('4851', '1e02') 
+    let src = cover;
+
+    if (streamingService == 'spotify') {
+        src = cover.replace('4851', '1e02');
     }
+
     let tempCover = new Image();
     tempCover.crossOrigin = "anonymous";
     tempCover.src = src;
@@ -196,73 +204,79 @@ function drawTrackInfos(){
         ctx.fillText(currentTrack.split('<->')[0].replace("amp;", ''), 30, 417);
         ctx.font = `25px Oswald`;
         ctx.fillText(currentTrack.split('<->')[1].replace("amp;", ''), 30, 450);
+
+        if (callback) {
+            callback();
+        }
     });
 }
 
+
 function writeText(currentText, previousText, nextText) {
     if (canvas) {
-        drawTrackInfos();
-        ctx = canvas.getContext('2d');
-        ctx.textAlign = 'center';
-        ctx.font = `40px Oswald`
-        let maxWidth = 430;
-        let spaceBetweenLines = 7;
-        let spaceBetweenVerses = 15;
-        var centerX = 470 / 2;
-        var centerY = 400 / 2;
-
-        var lineHeight = 40 + spaceBetweenLines;
-        function splitText(text) {
-            var words = text.split(" ");
-            var lines = [];
-            var currentLine = "";
-
-            words.forEach(function (word) {
-                var testLine = currentLine + (currentLine ? " " : "") + word;
-                var testWidth = ctx.measureText(testLine).width;
-
-                if (testWidth > maxWidth) {
-                    lines.push(currentLine);
-                    currentLine = word;
-                } else {
-                    currentLine = testLine;
-                }
-            });
-            lines.push(currentLine);
-            return lines;
-        }
-
-        function drawText(text, startY) {
-            var lines = splitText(text);
-            lines.forEach(function (line) {
-                ctx.fillText(line, centerX, startY);
-                startY += lineHeight;
-            });
-        }
-
-        let linesLength = splitText(currentText).length;
-        let textHeight = linesLength * lineHeight;
-        var currentYStart = (centerY - (textHeight / 2) + (spaceBetweenLines * linesLength)) + (lineHeight / 2);
-
-        drawText(currentText, currentYStart);
-
-        if (previousText) {
-            ctx.globalAlpha = 0.55;
-            ctx.font = `30px Oswald`;
-            let previousTextHeight = lineHeight * splitText(previousText).length;
-            var previousYStart = currentYStart - previousTextHeight - spaceBetweenLines - spaceBetweenVerses;
-            drawText(previousText, previousYStart);
-            ctx.globalAlpha = 1;
-            ctx.font = `40px Oswald`;
-        }
-
-        if (nextText) {
-            ctx.globalAlpha = 0.55;
-            ctx.font = `35px Oswald`;
-            var nextYStart = currentYStart + textHeight + spaceBetweenLines + spaceBetweenVerses;
-            drawText(nextText, nextYStart);
-            ctx.globalAlpha = 1;
-            ctx.font = `40px Oswald`;
-        }
+        drawTrackInfos(() => {
+            ctx = canvas.getContext('2d');
+            ctx.textAlign = 'center';
+            ctx.font = `40px Oswald`
+            let maxWidth = 430;
+            let spaceBetweenLines = 7;
+            let spaceBetweenVerses = 15;
+            var centerX = 470 / 2;
+            var centerY = 400 / 2;
+    
+            var lineHeight = 40 + spaceBetweenLines;
+            function splitText(text) {
+                var words = text.split(" ");
+                var lines = [];
+                var currentLine = "";
+    
+                words.forEach(function (word) {
+                    var testLine = currentLine + (currentLine ? " " : "") + word;
+                    var testWidth = ctx.measureText(testLine).width;
+    
+                    if (testWidth > maxWidth) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                });
+                lines.push(currentLine);
+                return lines;
+            }
+    
+            function drawText(text, startY) {
+                var lines = splitText(text);
+                lines.forEach(function (line) {
+                    ctx.fillText(line, centerX, startY);
+                    startY += lineHeight;
+                });
+            }
+    
+            let linesLength = splitText(currentText).length;
+            let textHeight = linesLength * lineHeight;
+            var currentYStart = (centerY - (textHeight / 2) + (spaceBetweenLines * linesLength)) + (lineHeight / 2);
+    
+            drawText(currentText, currentYStart);
+    
+            if (previousText) {
+                ctx.globalAlpha = 0.55;
+                ctx.font = `30px Oswald`;
+                let previousTextHeight = lineHeight * splitText(previousText).length;
+                var previousYStart = currentYStart - previousTextHeight - spaceBetweenLines - spaceBetweenVerses;
+                drawText(previousText, previousYStart);
+                ctx.globalAlpha = 1;
+                ctx.font = `40px Oswald`;
+            }
+    
+            if (nextText) {
+                ctx.globalAlpha = 0.55;
+                ctx.font = `35px Oswald`;
+                var nextYStart = currentYStart + textHeight + spaceBetweenLines + spaceBetweenVerses;
+                drawText(nextText, nextYStart);
+                ctx.globalAlpha = 1;
+                ctx.font = `40px Oswald`;
+            }
+        });
     }
 }
