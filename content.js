@@ -170,6 +170,9 @@ setInterval(() => {
                     setInterval(() => {
                         if(document.querySelector(selectors.currentTime)){
                             let currentTime = document.querySelector(selectors.currentTime).innerText
+                            if(streamingService == 'youtube'){
+                                currentTime = currentTime.split(' /')[0]
+                            }
                             if(currentTime.split(':')[0].length === 1){
                                 currentTime = `0${currentTime}`
                             }

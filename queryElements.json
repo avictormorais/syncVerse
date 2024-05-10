@@ -15,6 +15,14 @@
       "divSpan": "div.css-w7wtb1",
       "currentTime": "p[data-testid='elapsed_time']",
       "cover": "div[data-testid='item_cover'] > div > img"
+    },
+    "youtube": {
+      "track": "yt-formatted-string.title.style-scope.ytmusic-player-bar > span",
+      "divArtists": "span.subtitle.style-scope.ytmusic-player-bar > yt-formatted-string.byline.style-scope.ytmusic-player-bar.complex-string",
+      "artist": "a.yt-simple-endpoint.style-scope.yt-formatted-string",
+      "divSpan": "div.left-controls-buttons.style-scope.ytmusic-player-bar",
+      "currentTime": "span.time-info.style-scope.ytmusic-player-bar",
+      "cover": "img.image.style-scope.ytmusic-player-bar"
     }
   }
 }
