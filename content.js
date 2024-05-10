@@ -144,7 +144,11 @@ setInterval(() => {
         let artists = '';
         artistsList.forEach(artist => {
             if(artist.innerHTML){
-                artists += `${artist.innerHTML}, `;
+                if(streamingService == 'youtube' && artist.href && artist.href.includes('browse')) {
+                    // It's a album link
+                } else {
+                    artists += `${artist.innerHTML}, `;
+                }
             }
         });
         artists = artists.slice(0, -2);
