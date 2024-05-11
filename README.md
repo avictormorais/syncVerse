@@ -28,6 +28,26 @@ To install syncVerse, follow these steps:
 5. **Click** on "Load unpacked" and select the directory where you unzipped the extension.
 6. syncVerse should now be installed and ready to use.
 
+## Browser Compatibility 🌐
+
+syncVerse is compatible with the following browsers and platforms:
+
+- **Google Chrome**: Fully supported.
+- **Microsoft Edge**: Fully supported.
+- **Chrome-based Browsers**: Such as Brave and Opera, fully supported.
+- **Mozilla Firefox**: Not supported due to lack of native Picture-in-Picture (PiP) support.
+
+## Supported Streaming Services 🎵
+
+syncVerse supports the following music streaming services:
+
+- Spotify
+- Deezer
+- YouTube Music
+- (more services will be added in the future)
+
+If you wish to add support for a new streaming service, feel free to make a request.
+
 ## Usage 🎶
 
 Once syncVerse is installed, follow these steps to use it:
