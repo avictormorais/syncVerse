@@ -9,7 +9,7 @@
 
 ## Result 🖼️
 
-<img src="https://cdn.discordapp.com/attachments/1185624043790024744/1237894912339480606/2024-05-0517-21-02-ezgif.com-video-to-gif-converter.gif?ex=663d4efa&is=663bfd7a&hm=f027ea6ea6c1b731c153f3860d4ae3462c75a1b252400345bb64bdcfa4199b9e&" alt="syncVerse" height="250">
+<img src="https://github.com/avictormorais/syncVerse/blob/336345c67f67b462b1d10da01b8b639b09b68918/result.gif?raw=true" alt="syncVerse" height="250">
 
 ## Features ✨
 
