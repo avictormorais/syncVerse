@@ -33,7 +33,7 @@ async function getLyrics(query){
         canvas.height = 470;
         var contexto = canvas.getContext('2d');
         contexto.fillStyle = 'white';
-        contexto.font = `70px Oswald`;
+        contexto.font = `70px Rubik`;
         drawTrackInfos();
 
         const stream = canvas.captureStream(25);
@@ -221,9 +221,9 @@ function drawTrackInfos(callback) {
 
         ctx.fillStyle = 'white';
         ctx.textAlign = 'left';
-        ctx.font = `35px Oswald`;
+        ctx.font = `35px Rubik`;
         ctx.fillText(currentTrack.split('<->')[0].replace("amp;", ''), 30, 417);
-        ctx.font = `25px Oswald`;
+        ctx.font = `25px Rubik`;
         ctx.fillText(currentTrack.split('<->')[1].replace("amp;", ''), 30, 450);
 
         if (callback) {
@@ -232,13 +232,12 @@ function drawTrackInfos(callback) {
     });
 }
 
-
 function writeText(currentText, previousText, nextText) {
     if (canvas) {
         drawTrackInfos(() => {
             ctx = canvas.getContext('2d');
             ctx.textAlign = 'center';
-            ctx.font = `40px Oswald`
+            ctx.font = `40px Rubik`
             let maxWidth = 430;
             let spaceBetweenLines = 7;
             let spaceBetweenVerses = 15;
@@ -282,21 +281,21 @@ function writeText(currentText, previousText, nextText) {
     
             if (previousText) {
                 ctx.globalAlpha = 0.55;
-                ctx.font = `30px Oswald`;
+                ctx.font = `28px Rubik`;
                 let previousTextHeight = lineHeight * splitText(previousText).length;
                 var previousYStart = currentYStart - previousTextHeight - spaceBetweenLines - spaceBetweenVerses;
                 drawText(previousText, previousYStart);
                 ctx.globalAlpha = 1;
-                ctx.font = `40px Oswald`;
+                ctx.font = `40px Rubik`;
             }
     
             if (nextText) {
                 ctx.globalAlpha = 0.55;
-                ctx.font = `35px Oswald`;
+                ctx.font = `28px Rubik`;
                 var nextYStart = currentYStart + textHeight + spaceBetweenLines + spaceBetweenVerses;
                 drawText(nextText, nextYStart);
                 ctx.globalAlpha = 1;
-                ctx.font = `40px Oswald`;
+                ctx.font = `40px Rubik`;
             }
         });
     }
