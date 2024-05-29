@@ -222,7 +222,7 @@ function drawTrackInfos(callback) {
         ctx.fillStyle = 'white';
         ctx.textAlign = 'left';
         ctx.font = `35px Rubik`;
-        ctx.fillText(currentTrack.split('<->')[0].replace("amp;", ''), 30, 417);
+        ctx.fillText(currentTrack.split('<->')[0].replace("amp;", '').split(' (')[0], 30, 417);
         ctx.font = `25px Rubik`;
         ctx.fillText(currentTrack.split('<->')[1].replace("amp;", ''), 30, 450);
 
@@ -236,12 +236,12 @@ function writeText(currentText, previousText, nextText) {
     if (canvas) {
         drawTrackInfos(() => {
             ctx = canvas.getContext('2d');
-            ctx.textAlign = 'center';
+            ctx.textAlign = 'left';
             ctx.font = `40px Rubik`
             let maxWidth = 430;
             let spaceBetweenLines = 7;
             let spaceBetweenVerses = 15;
-            var centerX = 470 / 2;
+            var centerX = 30;
             var centerY = 400 / 2;
     
             var lineHeight = 40 + spaceBetweenLines;
@@ -254,7 +254,7 @@ function writeText(currentText, previousText, nextText) {
                     var testLine = currentLine + (currentLine ? " " : "") + word;
                     var testWidth = ctx.measureText(testLine).width;
     
-                    if (testWidth > maxWidth) {
+                    if (testWidth > maxWidth - 30) {
                         lines.push(currentLine);
                         currentLine = word;
                     } else {
