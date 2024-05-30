@@ -222,8 +222,18 @@ function drawTrackInfos(callback) {
         ctx.fillStyle = 'white';
         ctx.textAlign = 'left';
         ctx.font = `35px Rubik`;
+        function textWidth(text) {
+            return ctx.measureText(text).width;
+        }
+
+        while(textWidth(currentTrack.split('<->')[0].replace("amp;", '').split(' (')[0]) > 410){
+            ctx.font = `${parseInt(ctx.font) - 1}px Rubik`;
+        }
         ctx.fillText(currentTrack.split('<->')[0].replace("amp;", '').split(' (')[0], 30, 417);
         ctx.font = `25px Rubik`;
+        while(textWidth(currentTrack.split('<->')[1].replace("amp;", '')) > 410){
+            ctx.font = `${parseInt(ctx.font) - 1}px Rubik`;
+        }
         ctx.fillText(currentTrack.split('<->')[1].replace("amp;", ''), 30, 450);
 
         if (callback) {
