@@ -6,6 +6,7 @@
       "artist": "a[data-testid='context-item-info-artist'][draggable='true']",
       "divSpan": "div[data-testid='now-playing-widget']",
       "currentTime": "div[data-testid='playback-position']",
+      "playbackDuration": "div[data-testid='playback-duration']",
       "cover": "img[data-testid='cover-art-image']"
     },
     "deezer": {
@@ -14,6 +15,7 @@
       "artist": "a.chakra-link.track-link",
       "divSpan": "div.css-w7wtb1",
       "currentTime": "p[data-testid='elapsed_time']",
+      "playbackDuration": "p[data-testid='remaining_time']",
       "cover": "div[data-testid='item_cover'] > div > img"
     },
     "youtube": {
@@ -22,6 +24,7 @@
       "artist": "a.yt-simple-endpoint.style-scope.yt-formatted-string",
       "divSpan": "div.left-controls-buttons.style-scope.ytmusic-player-bar",
       "currentTime": "span.time-info.style-scope.ytmusic-player-bar",
+      "playbackDuration": "span.time-info.style-scope.ytmusic-player-bar",
       "cover": "img.image.style-scope.ytmusic-player-bar"
     }
   }

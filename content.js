@@ -30,7 +30,7 @@ async function getLyrics(query){
     if(!canvas){
         canvas = document.createElement('canvas');
         canvas.width = 470;
-        canvas.height = 470;
+        canvas.height = 473;
         var contexto = canvas.getContext('2d');
         contexto.fillStyle = 'white';
         contexto.font = `70px Rubik`;
@@ -96,7 +96,8 @@ fetch('https://raw.githubusercontent.com/avictormorais/syncVerse/main/queryEleme
         artist: selector.artist,
         divSpan: selector.divSpan,
         currentTime: selector.currentTime,
-        cover: selector.cover
+        cover: selector.cover,
+        playbackDuration: selector.playbackDuration
     };
 });
 
@@ -174,12 +175,38 @@ setInterval(() => {
                     setInterval(() => {
                         if(document.querySelector(selectors.currentTime)){
                             let currentTime = document.querySelector(selectors.currentTime).innerText
+                            let playbackDuration = document.querySelector(selectors.playbackDuration).innerText
+
                             if(streamingService == 'youtube'){
                                 currentTime = currentTime.split(' /')[0]
                             }
+                            if(streamingService == 'youtube'){
+                                playbackDuration = playbackDuration.split(' /')[1]
+                            }
+
                             if(currentTime.split(':')[0].length === 1){
                                 currentTime = `0${currentTime}`
                             }
+                            if(playbackDuration.split(':')[0].length === 1){
+                                playbackDuration = `0${playbackDuration}`
+                            }
+
+                            function getCompletionPercentage(currentTime, totalTime) {
+                                const toMinutes = time => {
+                                    const [hours, minutes] = time.split(':').map(Number);
+                                    return hours * 60 + minutes;
+                                };
+                                const currentMinutes = toMinutes(currentTime);
+                                const totalMinutes = toMinutes(totalTime);
+                                return ((currentMinutes / totalMinutes) * 100) * 4.7;
+                            }
+
+                            ctx = canvas.getContext('2d');
+                            ctx.fillStyle = '#4d4d4d';
+                            ctx.fillRect(0, 470, 471, 3);
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(0, 470, getCompletionPercentage(currentTime, playbackDuration), 3);
+
                             let verses = findVerseByTime(currentTime)
                             if(verses){
                                 if(verses.currentVerse.verse !== currentVerse){
@@ -216,12 +243,12 @@ function drawTrackInfos(callback) {
         ctx.filter = "blur(5px)";
         ctx.drawImage(tempCover, 0, 0, 470, 470);
         ctx.filter = "brightness(0.7)";
-        ctx.drawImage(canvas, 0, 0, 470, 470);
+        ctx.drawImage(canvas, 0, 0, 470, 480);
         ctx.filter = "none";
 
         ctx.fillStyle = 'white';
         ctx.textAlign = 'left';
-        ctx.font = `35px Rubik`;
+        ctx.font = `30px Rubik`;
         function textWidth(text) {
             return ctx.measureText(text).width;
         }
@@ -229,9 +256,9 @@ function drawTrackInfos(callback) {
         while(textWidth(currentTrack.split('<->')[0].replace("amp;", '').split(' (')[0]) > 410){
             ctx.font = `${parseInt(ctx.font) - 1}px Rubik`;
         }
-        ctx.fillText(currentTrack.split('<->')[0].replace("amp;", '').split(' (')[0], 30, 417);
-        ctx.font = `25px Rubik`;
-        while(textWidth(currentTrack.split('<->')[1].replace("amp;", '')) > 410){
+        ctx.fillText(currentTrack.split('<->')[0].replace("amp;", '').split(' (')[0], 30, 420);
+        ctx.font = `20px Rubik`;
+        while(textWidth(currentTrack.split('<->')[1].replace("amp;", '')) > 415){
             ctx.font = `${parseInt(ctx.font) - 1}px Rubik`;
         }
         ctx.fillText(currentTrack.split('<->')[1].replace("amp;", ''), 30, 450);
@@ -247,14 +274,14 @@ function writeText(currentText, previousText, nextText) {
         drawTrackInfos(() => {
             ctx = canvas.getContext('2d');
             ctx.textAlign = 'left';
-            ctx.font = `40px Rubik`
+            ctx.font = `35px Rubik`
             let maxWidth = 430;
             let spaceBetweenLines = 7;
-            let spaceBetweenVerses = 15;
+            let spaceBetweenVerses = 8;
             var centerX = 30;
             var centerY = 400 / 2;
     
-            var lineHeight = 40 + spaceBetweenLines;
+            var lineHeight = 35 + spaceBetweenLines;
             function splitText(text) {
                 var words = text.split(" ");
                 var lines = [];
