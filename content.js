@@ -279,7 +279,7 @@ function writeText(currentText, previousText, nextText) {
             let spaceBetweenLines = 7;
             let spaceBetweenVerses = 8;
             var centerX = 30;
-            var centerY = 400 / 2;
+            var centerY = 380 / 2;
     
             var lineHeight = 35 + spaceBetweenLines;
             function splitText(text) {
@@ -319,9 +319,16 @@ function writeText(currentText, previousText, nextText) {
             if (previousText) {
                 ctx.globalAlpha = 0.55;
                 ctx.font = `28px Rubik`;
-                let previousTextHeight = lineHeight * splitText(previousText).length;
-                var previousYStart = currentYStart - previousTextHeight - spaceBetweenLines - spaceBetweenVerses;
-                drawText(previousText, previousYStart);
+                if(previousText.length > 50){
+                    previousText = '...' + previousText.substring(previousText.length - 47, previousText.length);
+                    let previousTextHeight = lineHeight * splitText(previousText).length;
+                    var previousYStart = currentYStart - previousTextHeight - spaceBetweenLines - spaceBetweenVerses;
+                    drawText(previousText, previousYStart);
+                } else{
+                    let previousTextHeight = lineHeight * splitText(previousText).length;
+                    var previousYStart = currentYStart - previousTextHeight - spaceBetweenLines - spaceBetweenVerses;
+                    drawText(previousText, previousYStart);
+                }
                 ctx.globalAlpha = 1;
                 ctx.font = `40px Rubik`;
             }
@@ -329,8 +336,14 @@ function writeText(currentText, previousText, nextText) {
             if (nextText) {
                 ctx.globalAlpha = 0.55;
                 ctx.font = `28px Rubik`;
-                var nextYStart = currentYStart + textHeight + spaceBetweenLines + spaceBetweenVerses;
-                drawText(nextText, nextYStart);
+                if(nextText.length > 50){
+                    nextText = nextText.substring(0, 47) + '...';
+                    var nextYStart = currentYStart + textHeight + spaceBetweenLines + spaceBetweenVerses;
+                    drawText(nextText, nextYStart);
+                } else{
+                    var nextYStart = currentYStart + textHeight + spaceBetweenLines + spaceBetweenVerses;
+                    drawText(nextText, nextYStart);
+                }
                 ctx.globalAlpha = 1;
                 ctx.font = `40px Rubik`;
             }
