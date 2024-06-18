@@ -209,9 +209,9 @@ setInterval(() => {
 
                             let verses = findVerseByTime(currentTime)
                             if(verses){
-                                if(verses.currentVerse.verse !== currentVerse){
+                                if(verses.currentVerse !== currentVerse){
                                     writeText(verses.currentVerse.verse, verses.previousVerse.verse, verses.nextVerse.verse);
-                                    currentVerse = verses.currentVerse.verse
+                                    currentVerse = verses.currentVerse
                                 }
                             }
                         }
