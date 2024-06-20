@@ -202,8 +202,10 @@ setInterval(() => {
                             }
 
                             ctx = canvas.getContext('2d');
-                            ctx.fillStyle = '#4d4d4d';
-                            ctx.fillRect(0, 470, 471, 3);
+                            if (currentVerse && currentVerse.time && currentVerse.time < playbackDuration) {
+                                ctx.fillStyle = '#8d8d8d';
+                                ctx.fillRect(0, 470, 471, 3);
+                            }
                             ctx.fillStyle = 'white';
                             ctx.fillRect(0, 470, getCompletionPercentage(currentTime, playbackDuration), 3);
 
